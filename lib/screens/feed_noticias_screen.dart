@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/noticia_model.dart';
 import '../services/noticia_service.dart';
+import 'detalhe_noticia_screen.dart';
 
 class FeedNoticiasScreen extends StatefulWidget {
   const FeedNoticiasScreen({super.key});
@@ -52,6 +53,15 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
     } finally {
       setState(() => _carregando = false);
     }
+  }
+
+  void _abrirDetalhes(NoticiaModel noticia) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetalheNoticiaScreen(noticia: noticia),
+      ),
+    );
   }
 
   @override
@@ -134,6 +144,8 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
             leading: CircleAvatar(child: Text(noticia.id.toString())),
             title: Text(noticia.titulo, maxLines: 1, overflow: TextOverflow.ellipsis),
             subtitle: Text(noticia.resumo, maxLines: 2, overflow: TextOverflow.ellipsis),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _abrirDetalhes(noticia),
           ),
         );
       },
