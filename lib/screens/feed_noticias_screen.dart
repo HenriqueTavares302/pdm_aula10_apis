@@ -16,6 +16,7 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
 
   List<NoticiaModel> _noticias = [];
   bool _carregando = true;
+  bool _modoErro = false;
   String? _erro;
   String _filtro = '';
 
@@ -46,13 +47,18 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
     });
 
     try {
-      final lista = await _service.buscarNoticias();
+      final lista = await _service.buscarNoticias(simularErro: _modoErro);
       setState(() => _noticias = lista);
     } catch (e) {
       setState(() => _erro = e.toString().replaceAll('Exception: ', ''));
     } finally {
       setState(() => _carregando = false);
     }
+  }
+
+  void _alternarModoErro() {
+    setState(() => _modoErro = !_modoErro);
+    _carregarFeed();
   }
 
   void _abrirDetalhes(NoticiaModel noticia) {
@@ -71,10 +77,29 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Feed de Notícias'),
-        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _carregarFeed)],
+        actions: [
+          IconButton(
+            icon: Icon(_modoErro ? Icons.bug_report : Icons.bug_report_outlined),
+            color: _modoErro ? Colors.red : null,
+            tooltip: 'Simular erro de conexão',
+            onPressed: _alternarModoErro,
+          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _carregarFeed),
+        ],
       ),
       body: Column(
         children: [
+          if (_modoErro)
+            Container(
+              width: double.infinity,
+              color: Colors.red.shade100,
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                'Modo de teste: usando URL inválida',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
           if (mostrarBusca)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -108,13 +133,22 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
 
     if (_erro != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(_erro!, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 12),
-            ElevatedButton(onPressed: _carregarFeed, child: const Text('Tentar Novamente')),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.cloud_off, size: 56, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                _erro!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(onPressed: _carregarFeed, child: const Text('Tentar Novamente')),
+            ],
+          ),
         ),
       );
     }
