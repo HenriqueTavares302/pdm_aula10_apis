@@ -4,14 +4,16 @@ import '../services/noticia_service.dart';
 import 'detalhe_noticia_screen.dart';
 
 class FeedNoticiasScreen extends StatefulWidget {
-  const FeedNoticiasScreen({super.key});
+  final NoticiaService? service;
+
+  const FeedNoticiasScreen({super.key, this.service});
 
   @override
   State<FeedNoticiasScreen> createState() => _FeedNoticiasScreenState();
 }
 
 class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
-  final _service = NoticiaService();
+ late final NoticiaService _service;
   final _buscaController = TextEditingController();
 
   List<NoticiaModel> _noticias = [];
@@ -20,12 +22,13 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
   String? _erro;
   String _filtro = '';
 
-  @override
+    @override
   void initState() {
     super.initState();
+    _service = widget.service ?? NoticiaService();
     _carregarFeed();
   }
-
+  
   @override
   void dispose() {
     _buscaController.dispose();
