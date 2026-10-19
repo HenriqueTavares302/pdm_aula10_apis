@@ -13,10 +13,10 @@ class NoticiaService {
         final List<dynamic> listaJson = jsonDecode(response.body);
         return listaJson.map((json) => NoticiaModel.fromJson(json)).toList();
       } else {
-        throw Exception('Status HTTP de erro: ' + response.statusCode.toString());
+         throw Exception('Status HTTP de erro: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Falha ao conectar com a API: ' + e.toString());
+      throw Exception('Falha ao conectar com a API: ${e.toString()}');
     }
   }
 }
